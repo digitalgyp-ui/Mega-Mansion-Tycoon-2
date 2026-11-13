@@ -118,7 +118,7 @@ return function(State, Dependencies)
     function AutoBuy.createUI(AutomationsTab)
 
         AutomationsTab:CreateSection({
-            name = "Purchase Automation",
+            name = "Automation",
         })
 
         AutomationsTab:CreateToggle({
