@@ -337,14 +337,13 @@ return function(State, Helpers, Dependencies)
     --==================================================
     -- RENDER DYNAMIC ISLAND
     --==================================================
+local function renderDynamicIsland()
 
-    local function renderDynamicIsland()
+    islandHeader.Text = "RENDER CALLED"
 
-        if not State.running or State.purchaseAnimationActive then
-            return
-        end
-
-        islandHeader.Text = "SPACING TEST 123"
+    if not State.running or State.purchaseAnimationActive then
+        return
+    end
 
         local state = State.currentIslandState
         local kind = state.kind
