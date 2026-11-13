@@ -344,7 +344,7 @@ return function(State, Helpers, Dependencies)
             return
         end
 
-        islandHeader.Text = getIslandHeader()
+islandHeader.Text = formatIslandHeader(getIslandHeader())
 
         local state = State.currentIslandState
         local kind = state.kind
