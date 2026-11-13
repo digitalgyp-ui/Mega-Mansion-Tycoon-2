@@ -659,6 +659,12 @@ return function(State, Helpers, Dependencies)
             end,
         })
 
+        -- MANUAL COLLECTION SECTION
+
+        AutomationsTab:CreateSection({
+            name = "Manual Collection",
+        })
+
         AutomationsTab:CreateButton({
             name = "Collect Money Once",
 
