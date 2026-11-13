@@ -344,7 +344,7 @@ return function(State, Helpers, Dependencies)
             return
         end
 
-        islandHeader.Text = formatIslandHeader(getIslandHeader())
+        islandHeader.Text = "SPACING TEST 123"
 
         local state = State.currentIslandState
         local kind = state.kind
