@@ -10,7 +10,7 @@
 --==================================================
 
 local BASE_URL =
-    "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPOSITORY/main/"
+    "https://raw.githubusercontent.com/digitalgyp-ui/Mega-Mansion-Tycoon-2/main/"
 
 -- Replace the placeholder URL after creating the repository.
 
@@ -241,6 +241,77 @@ local function waitForMoneyDelta(beforeMoney, timeout)
 end
 
 --==================================================
+-- PURCHASING INTERACTION ADAPTER
+--==================================================
+
+local function purchaseInteraction(data)
+
+    local root = Character.getRootPart()
+
+    if not root or not root.Parent then
+        return false, "Character HumanoidRootPart is missing."
+    end
+
+    if not data or not data.hitbox or not data.hitbox.Parent then
+        return false, "Purchase TouchHitbox is missing."
+    end
+
+    if State.movementBusy then
+        return false, "Another character movement/touch action is already running."
+    end
+
+    local touchFunction = firetouchinterest
+    local originalCFrame = root.CFrame
+
+    State.movementBusy = true
+
+    local ok, err = pcall(function()
+
+        if State.purchaseMethod == "TouchInterest" then
+
+            if typeof(touchFunction) ~= "function" then
+                error("firetouchinterest is unavailable in this executor.")
+            end
+
+            touchFunction(root, data.hitbox, 0)
+            task.wait(0.12)
+            touchFunction(root, data.hitbox, 1)
+
+        else
+
+            root.CFrame = data.hitbox.CFrame * CFrame.new(0, 2, 0)
+            task.wait(0.25)
+
+            if typeof(touchFunction) == "function" then
+                touchFunction(root, data.hitbox, 0)
+                task.wait(0.12)
+                touchFunction(root, data.hitbox, 1)
+            end
+
+            task.wait(0.12)
+
+            if root.Parent then
+                root.CFrame = originalCFrame
+            end
+        end
+    end)
+
+    if not ok and root.Parent then
+        pcall(function()
+            root.CFrame = originalCFrame
+        end)
+    end
+
+    State.movementBusy = false
+
+    if not ok then
+        return false, tostring(err)
+    end
+
+    return true
+end
+
+--==================================================
 -- PURCHASING
 --==================================================
 
@@ -253,8 +324,7 @@ local purchaseDependencies = {
     getMoneyValue = getMoneyValue,
     logActivity = logActivity,
 
-    -- Interaction adapters are intentionally left unconfigured.
-    purchaseInteraction = nil,
+    purchaseInteraction = purchaseInteraction,
 }
 
 local Purchasing = loadModule("Purchases/Purchasing.lua")(
@@ -280,6 +350,39 @@ local AutoBuy = loadModule("Automation/AutoBuy.lua")(
 )
 
 --==================================================
+-- MAILBOX INTERACTION ADAPTER
+--==================================================
+
+local function mailboxInteraction(root, touchPart)
+
+    if not root or not root.Parent then
+        return false, "Character HumanoidRootPart is missing."
+    end
+
+    if not touchPart or not touchPart.Parent then
+        return false, "Mailbox TouchInterest part is missing."
+    end
+
+    local touchFunction = firetouchinterest
+
+    if typeof(touchFunction) ~= "function" then
+        return false, "firetouchinterest is unavailable in this executor."
+    end
+
+    local ok, err = pcall(function()
+        touchFunction(root, touchPart, 0)
+        task.wait(0.10)
+        touchFunction(root, touchPart, 1)
+    end)
+
+    if not ok then
+        return false, tostring(err)
+    end
+
+    return true
+end
+
+--==================================================
 -- AUTO COLLECT
 --==================================================
 
@@ -296,8 +399,7 @@ local AutoCollect = loadModule("Automation/AutoCollect.lua")(
         waitForMoneyDelta = waitForMoneyDelta,
         logActivity = logActivity,
 
-        -- Configure through an appropriate game-owned interaction.
-        mailboxInteraction = nil,
+        mailboxInteraction = mailboxInteraction,
     }
 )
 
