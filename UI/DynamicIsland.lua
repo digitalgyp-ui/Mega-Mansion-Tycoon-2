@@ -22,6 +22,26 @@ return function(State, Helpers, Dependencies)
     local trackConnection = Helpers.trackConnection
 
     --==================================================
+    -- DYNAMIC ISLAND HEADER FORMATTING
+    --==================================================
+
+    local function formatIslandHeader(text)
+        local formattedWords = {}
+
+        for word in tostring(text or ""):upper():gmatch("%S+") do
+            local letters = {}
+
+            for index = 1, #word do
+                table.insert(letters, word:sub(index, index))
+            end
+
+            table.insert(formattedWords, table.concat(letters, " "))
+        end
+
+        return table.concat(formattedWords, "  ")
+    end
+
+    --==================================================
     -- GUI CREATION
     --==================================================
 
@@ -89,7 +109,7 @@ return function(State, Helpers, Dependencies)
     islandHeader.Position = UDim2.fromOffset(0, 3)
     islandHeader.Size = UDim2.new(1, 0, 0, 11)
     islandHeader.Font = Enum.Font.GothamBold
-    islandHeader.Text = "A U T O  T Y C O O N"
+    islandHeader.Text = formatIslandHeader("AUTO TYCOON")
     islandHeader.TextSize = 9
     islandHeader.TextColor3 = Color3.fromRGB(125, 132, 143)
     islandHeader.TextXAlignment = Enum.TextXAlignment.Center
@@ -185,14 +205,14 @@ return function(State, Helpers, Dependencies)
         local collectActive = State.autoClaimEnabled
 
         if State.autoBuyEnabled and collectActive then
-            return "A U T O  T Y C O O N"
+            return "AUTO TYCOON"
         elseif State.autoBuyEnabled then
-            return "A U T O  B U Y"
+            return "AUTO BUY"
         elseif State.autoClaimEnabled then
-            return "A U T O  C O L L E C T  M O N E Y"
+            return "AUTO COLLECT MONEY"
         end
 
-        return "A U T O  T Y C O O N"
+        return "AUTO TYCOON"
     end
 
     function Island.shouldShowCollectionStatus()
@@ -315,26 +335,6 @@ return function(State, Helpers, Dependencies)
     end
 
     --==================================================
-    -- DYNAMIC ISLAND HEADER FORMATTING
-    --==================================================
-
-    local function formatIslandHeader(text)
-        local formattedWords = {}
-
-        for word in tostring(text or ""):upper():gmatch("%S+") do
-            local letters = {}
-
-            for index = 1, #word do
-                table.insert(letters, word:sub(index, index))
-            end
-
-            table.insert(formattedWords, table.concat(letters, " "))
-        end
-
-        return table.concat(formattedWords, "  ")
-    end
-
-    --==================================================
     -- RENDER DYNAMIC ISLAND
     --==================================================
 
@@ -344,7 +344,7 @@ return function(State, Helpers, Dependencies)
             return
         end
 
-islandHeader.Text = formatIslandHeader(getIslandHeader())
+        islandHeader.Text = formatIslandHeader(getIslandHeader())
 
         local state = State.currentIslandState
         local kind = state.kind
@@ -369,7 +369,7 @@ islandHeader.Text = formatIslandHeader(getIslandHeader())
             local textColor = automationActive and COLORS.Blue or COLORS.Muted
             local gradientColor = automationActive and COLORS.Blue or COLORS.Grey
 
-            islandHeader.Text = "A U T O  T Y C O O N"
+            islandHeader.Text = formatIslandHeader("AUTO TYCOON")
 
             plain("Waiting For Task", textColor, 14, gradientColor)
 
